@@ -21,9 +21,12 @@ namespace RandomTitleScreen
         {
             orig(self);
 
-            Options.UpdateAvailableScenes();
 
-            if (isInit) return;
+            if (isInit)
+            {
+                Options.UpdateAvailableScenes();
+            }
+
             isInit = true;
 
             MachineConnector.SetRegisteredOI(RandomTitleScreen.MOD_ID, Options.instance);
@@ -34,7 +37,7 @@ namespace RandomTitleScreen
         {
             orig(self, ID);
 
-            if (Options.availableMenuScenes.Count == 0) return;
+            if (Options.availableMenuScenes == null || Options.availableMenuScenes.Count == 0) return;
 
             if (Options.randomizeTitle.Value)
             {

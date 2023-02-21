@@ -27,7 +27,7 @@ namespace RandomTitleScreen
             null, "", "Randomize Options Menu?"));
 
         public static Configurable<bool> unlockAllBackgrounds = instance.config.Bind("unlockAllBackgrounds", false, new ConfigurableInfo(
-            "Whether all backgrounds are unlocked immediately." +
+            "Whether all backgrounds under options are unlocked immediately. Overriden by randomizer, disable options above to use a specific background." +
             "\nNot permanent, will return to normal locks if this setting is disabled.",
             null, "", "Unlock All Backgrounds?"));
 
@@ -90,8 +90,10 @@ namespace RandomTitleScreen
             AddTab(ref tabIndex, "Illustrations");
 
             GetAllMenuScenes();
-            scrollBox = new OpScrollBox(new Vector2(30.0f, 40.0f), new Vector2(540.0f, 430.0f), allMenuScenes.Count * 40.0f + 40.0f, false, false, true);
+
+            scrollBox = new OpScrollBox(new Vector2(30.0f, 40.0f), new Vector2(540.0f, 430.0f), allMenuScenes.Length * 40.0f + 40.0f, false, false, true);
             Tabs[1].AddItems(new UIelement[] { scrollBox });
+
             InitializeSceneConfig();
 
             AddNewLine(21);
@@ -102,31 +104,36 @@ namespace RandomTitleScreen
 
         public static List<Menu.MenuScene.SceneID> availableMenuScenes = new List<Menu.MenuScene.SceneID>();
 
-        private static List<Menu.MenuScene.SceneID> allMenuScenes = new List<Menu.MenuScene.SceneID>();
-        private static List<Configurable<bool>> enabledMenuScenes = new List<Configurable<bool>>();
+        private static Menu.MenuScene.SceneID[] allMenuScenes = null!;
+        private static Configurable<bool>[] enabledMenuScenes = null!;
+        private static OpCheckBox[] checkBoxes = null!;
 
         private static OpScrollBox scrollBox = null!;
-        private static List<OpCheckBox> checkBoxes = new List<OpCheckBox>();
 
         private static void GetAllMenuScenes()
         {
+            allMenuScenes = new Menu.MenuScene.SceneID[Menu.MenuScene.SceneID.values.Count];
+
+
             for (int i = 0; i < Menu.MenuScene.SceneID.values.Count; i++)
             {
                 string enumName = Menu.MenuScene.SceneID.values.entries[i];
                 Menu.MenuScene.SceneID sceneID = new Menu.MenuScene.SceneID(enumName);
 
-                allMenuScenes.Add(sceneID);
-
+                allMenuScenes[i] = sceneID;
             }
         }
 
         private static void InitializeSceneConfig()
         {
-            for (int i = 0; i < Menu.MenuScene.SceneID.values.Count; i++)
-            {
-                enabledMenuScenes.Add(configHolder.Bind(GenerateSceneKey(allMenuScenes[i]), IsSceneDefaultEnabled(allMenuScenes[i])));
+            enabledMenuScenes = new Configurable<bool>[allMenuScenes.Length];
+            checkBoxes = new OpCheckBox[allMenuScenes.Length];
 
-                checkBoxes.Add(new OpCheckBox(enabledMenuScenes[i], new Vector2(90.0f, GetCheckboxYOffset(i) + 3.0f)));
+            for (int i = 0; i < allMenuScenes.Length; i++)
+            {
+                enabledMenuScenes[i] = configHolder.Bind(GenerateSceneKey(allMenuScenes[i]), IsSceneDefaultEnabled(allMenuScenes[i]));
+
+                checkBoxes[i] = new OpCheckBox(enabledMenuScenes[i], new Vector2(90.0f, GetCheckboxYOffset(i) + 3.0f));
                 scrollBox.AddItems(new UIelement[] { checkBoxes[i] });
 
                 scrollBox.AddItems(new UIelement[]
@@ -144,7 +151,7 @@ namespace RandomTitleScreen
             }
         }
 
-        private static float GetCheckboxYOffset(int index) => (allMenuScenes.Count - index) * 40f - 15.01f;
+        private static float GetCheckboxYOffset(int index) => (allMenuScenes.Length - index) * 40f - 15.01f;
 
         private static string GenerateSceneKey(Menu.MenuScene.SceneID sceneID) => "MenuScene_" + sceneID.value;
 
@@ -157,11 +164,11 @@ namespace RandomTitleScreen
         {
             availableMenuScenes.Clear();
 
-            for (int i = 0; i < allMenuScenes.Count; i++)
+            for (int i = 0; i < allMenuScenes.Length; i++)
             {
                 if (checkBoxes[i].GetValueBool())
                 {
-                    availableMenuScenes.Add(allMenuScenes[i]);
+                   availableMenuScenes.Add(allMenuScenes[i]);
                 }
             }
         }
