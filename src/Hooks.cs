@@ -15,10 +15,13 @@ namespace RandomTitleScreen
             On.ProcessManager.RequestMainProcessSwitch_ProcessID += ProcessManager_RequestMainProcessSwitch_ProcessID;
         }
 
+        private static bool isInit = false;
+
         private static void RainWorld_OnModsInit(On.RainWorld.orig_OnModsInit orig, RainWorld self)
         {
             orig(self);
 
+            Options.UpdateAvailableScenes();
 
             if (isInit) return;
             isInit = true;
@@ -31,21 +34,16 @@ namespace RandomTitleScreen
         {
             orig(self, ID);
 
-            Options.UpdateAvailableScenes(self.rainWorld);
-
-            foreach (var menu in Options.availableScenes)
-            {
-                RandomTitleScreen.Logger.LogWarning(menu);
-            }
+            if (Options.availableMenuScenes.Count == 0) return;
 
             if (Options.randomizeTitle.Value)
             {
-                self.rainWorld.options.titleBackground = Options.availableScenes[Random.Range(0, Options.availableScenes.Count - 1)];
+                self.rainWorld.options.titleBackground = Options.availableMenuScenes[Random.Range(0, Options.availableMenuScenes.Count - 1)];
             }
 
             if (Options.randomizeOptions.Value)
             {
-                self.rainWorld.options.subBackground = Options.availableScenes[Random.Range(0, Options.availableScenes.Count - 1)];
+                self.rainWorld.options.subBackground = Options.availableMenuScenes[Random.Range(0, Options.availableMenuScenes.Count - 1)];
             }
         }
 
@@ -57,6 +55,5 @@ namespace RandomTitleScreen
             return orig(self, ind, regions);
         }
 
-        private static bool isInit = false;
     }
 }

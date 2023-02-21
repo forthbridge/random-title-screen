@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using IL.Menu;
 using Menu.Remix.MixedUI;
+using Menu.Remix.MixedUI.ValueTypes;
 using UnityEngine;
 
 namespace RandomTitleScreen
@@ -12,7 +14,7 @@ namespace RandomTitleScreen
         public static Options instance = new Options();
         private const string AUTHORS_NAME = "forthbridge";
 
-        public static List<Menu.MenuScene.SceneID> availableScenes = new List<Menu.MenuScene.SceneID>();
+        private static ConfigHolder configHolder = null!;
 
         #region Options
 
@@ -61,11 +63,15 @@ namespace RandomTitleScreen
         private readonly List<OpLabel> textLabels = new();
         #endregion
 
+
         private const int NUMBER_OF_TABS = 2;
 
         public override void Initialize()
         {
             base.Initialize();
+
+            configHolder = new ConfigHolder(this);
+
             Tabs = new OpTab[NUMBER_OF_TABS];
             int tabIndex = -1;
 
@@ -83,138 +89,82 @@ namespace RandomTitleScreen
 
             AddTab(ref tabIndex, "Illustrations");
 
+            GetAllMenuScenes();
+            scrollBox = new OpScrollBox(new Vector2(30.0f, 40.0f), new Vector2(540.0f, 430.0f), allMenuScenes.Count * 40.0f + 40.0f, false, false, true);
+            Tabs[1].AddItems(new UIelement[] { scrollBox });
+            InitializeSceneConfig();
+
             AddNewLine(21);
             DrawBox(ref Tabs[tabIndex]);
+
+            UpdateAvailableScenes();
         }
 
-        public static void UpdateAvailableScenes(RainWorld rainWorld)
-        {
-            availableScenes.Clear();
+        public static List<Menu.MenuScene.SceneID> availableMenuScenes = new List<Menu.MenuScene.SceneID>();
 
+        private static List<Menu.MenuScene.SceneID> allMenuScenes = new List<Menu.MenuScene.SceneID>();
+        private static List<Configurable<bool>> enabledMenuScenes = new List<Configurable<bool>>();
+
+        private static OpScrollBox scrollBox = null!;
+        private static List<OpCheckBox> checkBoxes = new List<OpCheckBox>();
+
+        private static void GetAllMenuScenes()
+        {
             for (int i = 0; i < Menu.MenuScene.SceneID.values.Count; i++)
             {
                 string enumName = Menu.MenuScene.SceneID.values.entries[i];
                 Menu.MenuScene.SceneID sceneID = new Menu.MenuScene.SceneID(enumName);
 
-                if (IsSceneUnlocked(sceneID, rainWorld))
-                {
-                    availableScenes.Add(sceneID);
-                }
+                allMenuScenes.Add(sceneID);
+
             }
         }
 
-        // Stupid non static classes!
-        #region Scene Unlock Determination
-        private static bool IsSceneUnlocked(Menu.MenuScene.SceneID sceneID, RainWorld rainWorld)
+        private static void InitializeSceneConfig()
         {
-            if (sceneID == Menu.MenuScene.SceneID.Outro_2_Up_Swim && !rainWorld.progression.miscProgressionData.redUnlocked)
+            for (int i = 0; i < Menu.MenuScene.SceneID.values.Count; i++)
             {
-                return false;
-            }
+                enabledMenuScenes.Add(configHolder.Bind(GenerateSceneKey(allMenuScenes[i]), IsSceneDefaultEnabled(allMenuScenes[i])));
 
-            int index = OptionToIndex(sceneID);
+                checkBoxes.Add(new OpCheckBox(enabledMenuScenes[i], new Vector2(90.0f, GetCheckboxYOffset(i) + 3.0f)));
+                scrollBox.AddItems(new UIelement[] { checkBoxes[i] });
 
-            if (index <= NonRegionButtons - 1)
-            {
-                return true;
-            }
-
-            if (index > NonRegionButtons - 1)
-            {
-                string text = Region.GetFullRegionOrder()[index - NonRegionButtons];
-                
-                if (text == "SU")
+                scrollBox.AddItems(new UIelement[]
                 {
-                    return true;
-                }
-
-                for (int i = 0; i < rainWorld.progression.regionNames.Length; i++)
-                {
-                    if (rainWorld.progression.regionNames[i] == text && rainWorld.progression.miscProgressionData.GetDiscoveredShelterStringsInRegion(text).Count > 0)
+                    new OpLabel(new Vector2(124.0f, GetCheckboxYOffset(i)), new Vector2(160f, 30f), allMenuScenes[i].ToString(), FLabelAlignment.Left, false, null)
                     {
-                        return true;
+                        bumpBehav = checkBoxes[i].bumpBehav
                     }
-                }
-            }
-            return false;
-        }
+                });
 
-        private static int OptionToIndex(Menu.MenuScene.SceneID sceneOption)
-        {
-            if (sceneOption == Menu.MenuScene.SceneID.MainMenu)
-            {
-                return 0;
-            }
-
-            if (sceneOption == Menu.MenuScene.SceneID.Intro_1_Tree)
-            {
-                return 1;
-            }
-
-            if (sceneOption == Menu.MenuScene.SceneID.Intro_3_In_Tree)
-            {
-                return 2;
-            }
-
-            if (sceneOption == Menu.MenuScene.SceneID.Intro_4_Walking)
-            {
-                return 3;
-            }
-
-            if (sceneOption == Menu.MenuScene.SceneID.Intro_5_Hunting)
-            {
-                return 4;
-            }
-
-            if (sceneOption == Menu.MenuScene.SceneID.Outro_2_Up_Swim)
-            {
-                return 5;
-            }
-
-            if (!(sceneOption == Menu.MenuScene.SceneID.MainMenu_Downpour))
-            {
-                for (int i = 0; i < Region.GetFullRegionOrder().Count; i++)
+                if (i > 0)
                 {
-                    if (sceneOption == Region.GetRegionLandscapeScene(Region.GetFullRegionOrder()[i]))
-                    {
-                        return i + NonRegionButtons;
-                    }
+                    UIfocusable.MutualVerticalFocusableBind(checkBoxes[i], checkBoxes[i - 1]);
                 }
-                return 0;
             }
-
-            if (!IsDownpourSceneAvailable())
-            {
-                return 0;
-            }
-            return 6;
         }
 
-        public static int NonRegionButtons
+        private static float GetCheckboxYOffset(int index) => (allMenuScenes.Count - index) * 40f - 15.01f;
+
+        private static string GenerateSceneKey(Menu.MenuScene.SceneID sceneID) => "MenuScene_" + sceneID.value;
+
+        private static bool IsSceneDefaultEnabled(Menu.MenuScene.SceneID sceneID)
         {
-            get
+            return true;
+        }
+
+        public static void UpdateAvailableScenes()
+        {
+            availableMenuScenes.Clear();
+
+            for (int i = 0; i < allMenuScenes.Count; i++)
             {
-                if (!IsDownpourSceneAvailable())
+                if (checkBoxes[i].GetValueBool())
                 {
-                    return 6;
+                    availableMenuScenes.Add(allMenuScenes[i]);
                 }
-
-                return 7;
             }
         }
-
-        private static bool IsDownpourSceneAvailable()
-        {
-            return File.Exists(AssetManager.ResolveFilePath(string.Concat(new string[]
-			{
-				"Scenes",
-				Path.DirectorySeparatorChar.ToString(),
-				"main menu - downpour",
-				Path.DirectorySeparatorChar.ToString(),
-				"main menu - downpour - flat.png"
-			})));
-        }
-#endregion
 
         #region UI Elements
         private void AddTab(ref int tabIndex, string tabName)
