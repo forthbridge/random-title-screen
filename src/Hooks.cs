@@ -21,15 +21,12 @@ namespace RandomTitleScreen
         {
             orig(self);
 
-
-            if (isInit)
-            {
-                Options.UpdateAvailableScenes();
-            }
-
+            if (isInit) return;
             isInit = true;
 
             MachineConnector.SetRegisteredOI(RandomTitleScreen.MOD_ID, Options.instance);
+
+            Options.InitializeMenuScenesConfig();
         }
 
         // Randomize background
@@ -37,16 +34,16 @@ namespace RandomTitleScreen
         {
             orig(self, ID);
 
-            if (Options.availableMenuScenes == null || Options.availableMenuScenes.Count == 0) return;
+            if (Options.enabledMenuScenes == null || Options.enabledMenuScenes.Count == 0) return;
 
             if (Options.randomizeTitle.Value)
             {
-                self.rainWorld.options.titleBackground = Options.availableMenuScenes[Random.Range(0, Options.availableMenuScenes.Count - 1)];
+                self.rainWorld.options.titleBackground = Options.enabledMenuScenes[Random.Range(0, Options.enabledMenuScenes.Count)];
             }
 
             if (Options.randomizeOptions.Value)
             {
-                self.rainWorld.options.subBackground = Options.availableMenuScenes[Random.Range(0, Options.availableMenuScenes.Count - 1)];
+                self.rainWorld.options.subBackground = Options.enabledMenuScenes[Random.Range(0, Options.enabledMenuScenes.Count)];
             }
         }
 

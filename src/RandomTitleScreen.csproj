@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Backups\Rain World\Rain World References\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\Backups\Rain World\Rain World References\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
@@ -19,6 +15,9 @@
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>..\..\Backups\Rain World\Rain World References\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\Backups\Rain World\Rain World References\BepInEx\utils\STRIPPED-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\Backups\Rain World\Rain World References\RainWorld_Data\Managed\UnityEngine.dll</HintPath>

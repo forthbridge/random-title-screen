@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using IL.Menu;
 using Menu.Remix.MixedUI;
@@ -13,8 +14,6 @@ namespace RandomTitleScreen
     {
         public static Options instance = new Options();
         private const string AUTHORS_NAME = "forthbridge";
-
-        private static ConfigHolder configHolder = null!;
 
         #region Options
 
@@ -31,6 +30,9 @@ namespace RandomTitleScreen
             "\nNot permanent, will return to normal locks if this setting is disabled.",
             null, "", "Unlock All Backgrounds?"));
 
+        private OpSimpleButton? selectAllButton;
+
+        private OpSimpleButton? deselectAllButton;
         #endregion
 
         #region Parameters
@@ -63,14 +65,16 @@ namespace RandomTitleScreen
         private readonly List<OpLabel> textLabels = new();
         #endregion
 
+        public Options()
+        {
+            OnConfigChanged += UpdateAvailableScenes;
+        }
 
         private const int NUMBER_OF_TABS = 2;
 
         public override void Initialize()
         {
             base.Initialize();
-
-            configHolder = new ConfigHolder(this);
 
             Tabs = new OpTab[NUMBER_OF_TABS];
             int tabIndex = -1;
@@ -88,52 +92,47 @@ namespace RandomTitleScreen
             DrawBox(ref Tabs[tabIndex]);
 
             AddTab(ref tabIndex, "Illustrations");
+            AddNewLine(2);
 
-            GetAllMenuScenes();
-
-            scrollBox = new OpScrollBox(new Vector2(30.0f, 40.0f), new Vector2(540.0f, 430.0f), allMenuScenes.Length * 40.0f + 40.0f, false, false, true);
-            Tabs[1].AddItems(new UIelement[] { scrollBox });
-
-            InitializeSceneConfig();
-
-            AddNewLine(21);
-            DrawBox(ref Tabs[tabIndex]);
-
-            UpdateAvailableScenes();
-        }
-
-        public static List<Menu.MenuScene.SceneID> availableMenuScenes = new List<Menu.MenuScene.SceneID>();
-
-        private static Menu.MenuScene.SceneID[] allMenuScenes = null!;
-        private static Configurable<bool>[] enabledMenuScenes = null!;
-        private static OpCheckBox[] checkBoxes = null!;
-
-        private static OpScrollBox scrollBox = null!;
-
-        private static void GetAllMenuScenes()
-        {
-            allMenuScenes = new Menu.MenuScene.SceneID[Menu.MenuScene.SceneID.values.Count];
-
-
-            for (int i = 0; i < Menu.MenuScene.SceneID.values.Count; i++)
+            selectAllButton = new OpSimpleButton(new Vector2(350.0f, pos.y), new Vector2(150.0f, 30.0f), "Select All")
             {
-                string enumName = Menu.MenuScene.SceneID.values.entries[i];
-                Menu.MenuScene.SceneID sceneID = new Menu.MenuScene.SceneID(enumName);
+                colorEdge = new Color(1f, 1f, 1f, 1f),
+                colorFill = new Color(0.0f, 0.5f, 0.0f, 0.5f),
+                description = "Enables all the menu illustrations"
+            };
+            selectAllButton.OnClick += SelectAllButton_OnClick;
+            Tabs[tabIndex].AddItems(selectAllButton);
 
-                allMenuScenes[i] = sceneID;
-            }
+            deselectAllButton = new OpSimpleButton(new Vector2(100.0f, pos.y), new Vector2(150.0f, 30.0f), "Deselect All")
+            {
+                colorEdge = new Color(1f, 1f, 1f, 1f),
+                colorFill = new Color(0.5f, 0.0f, 0.0f, 0.5f),
+                description = "Disables all the menu illustrations."
+            };
+            deselectAllButton.OnClick += DeselectAllButton_OnClick;
+            Tabs[tabIndex].AddItems(deselectAllButton);
+
+            DrawScrollbox(ref tabIndex);
+
+            AddNewLine(19);
+            DrawBox(ref Tabs[tabIndex]);
         }
 
-        private static void InitializeSceneConfig()
+        private void DrawScrollbox(ref int tabIndex)
         {
-            enabledMenuScenes = new Configurable<bool>[allMenuScenes.Length];
             checkBoxes = new OpCheckBox[allMenuScenes.Length];
+            scrollBox = new OpScrollBox(new Vector2(30.0f, 40.0f), new Vector2(540.0f, 380.0f), allMenuScenes.Length * 40.0f + 40.0f, false, false, true);
+            Tabs[tabIndex].AddItems(new UIelement[] { scrollBox });
 
             for (int i = 0; i < allMenuScenes.Length; i++)
             {
-                enabledMenuScenes[i] = configHolder.Bind(GenerateSceneKey(allMenuScenes[i]), IsSceneDefaultEnabled(allMenuScenes[i]));
+                checkBoxes[i] = new OpCheckBox(menuScenesConfig[i], new Vector2(90.0f, GetCheckboxYOffset(i) + 3.0f));
 
-                checkBoxes[i] = new OpCheckBox(enabledMenuScenes[i], new Vector2(90.0f, GetCheckboxYOffset(i) + 3.0f));
+                if (i > 0)
+                {
+                    UIfocusable.MutualVerticalFocusableBind(checkBoxes[i], checkBoxes[i - 1]);
+                }
+
                 scrollBox.AddItems(new UIelement[] { checkBoxes[i] });
 
                 scrollBox.AddItems(new UIelement[]
@@ -144,11 +143,65 @@ namespace RandomTitleScreen
                     }
                 });
 
-                if (i > 0)
+            }
+        }
+
+        private void SelectAllButton_OnClick(UIfocusable trigger)
+        {
+            foreach (OpCheckBox checkBox in checkBoxes)
+            {
+                checkBox.SetValueBool(true);
+            }
+        }
+
+        private void DeselectAllButton_OnClick(UIfocusable trigger)
+        {
+            foreach (OpCheckBox checkBox in checkBoxes)
+            {
+                checkBox.SetValueBool(false);
+            }
+        }
+
+
+        public static List<Menu.MenuScene.SceneID> enabledMenuScenes = new List<Menu.MenuScene.SceneID>();
+        private static Configurable<bool>[] menuScenesConfig = null!;
+
+        private static Menu.MenuScene.SceneID[] allMenuScenes = null!;
+
+        private static OpCheckBox[] checkBoxes = null!;
+        private static OpScrollBox scrollBox = null!;
+
+        public static void InitializeMenuScenesConfig()
+        {
+            allMenuScenes = new Menu.MenuScene.SceneID[Menu.MenuScene.SceneID.values.Count];
+            menuScenesConfig = new Configurable<bool>[allMenuScenes.Length];
+
+            for (int i = 0; i < allMenuScenes.Length; i++)
+            {
+                string enumName = Menu.MenuScene.SceneID.values.entries[i];
+                Menu.MenuScene.SceneID sceneID = new Menu.MenuScene.SceneID(enumName);
+
+                allMenuScenes[i] = sceneID;
+
+                menuScenesConfig[i] = instance.config.Bind(GenerateSceneKey(allMenuScenes[i]), IsSceneDefaultEnabled(allMenuScenes[i]));
+            }
+
+            UpdateAvailableScenes();
+        }
+
+        private static void UpdateAvailableScenes()
+        {
+            enabledMenuScenes.Clear();
+
+            for (int i = 0; i < allMenuScenes.Length; i++)
+            {
+                if (menuScenesConfig[i].Value)
                 {
-                    UIfocusable.MutualVerticalFocusableBind(checkBoxes[i], checkBoxes[i - 1]);
+                    enabledMenuScenes.Add(allMenuScenes[i]);
                 }
             }
+
+            RandomTitleScreen.Logger.LogWarning("Updated enabled scenes!");
         }
 
         private static float GetCheckboxYOffset(int index) => (allMenuScenes.Length - index) * 40f - 15.01f;
@@ -157,20 +210,9 @@ namespace RandomTitleScreen
 
         private static bool IsSceneDefaultEnabled(Menu.MenuScene.SceneID sceneID)
         {
+            if (sceneID == Menu.MenuScene.SceneID.Empty) return false;
+
             return true;
-        }
-
-        public static void UpdateAvailableScenes()
-        {
-            availableMenuScenes.Clear();
-
-            for (int i = 0; i < allMenuScenes.Length; i++)
-            {
-                if (checkBoxes[i].GetValueBool())
-                {
-                   availableMenuScenes.Add(allMenuScenes[i]);
-                }
-            }
         }
 
         #region UI Elements
