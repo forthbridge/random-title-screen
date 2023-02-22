@@ -25,10 +25,14 @@ namespace RandomTitleScreen
             "Whether the options menu illustrations are randomized.",
             null, "", "Randomize Options Menu?"));
 
-        public static Configurable<bool> unlockAllBackgrounds = instance.config.Bind("unlockAllBackgrounds", false, new ConfigurableInfo(
+        public static Configurable<bool> unlockAllBackgrounds = instance.config.Bind("unlockAllBackgrounds", true, new ConfigurableInfo(
             "Whether all backgrounds under options are unlocked immediately. Overriden by randomizer, disable options above to use a specific background." +
             "\nNot permanent, will return to normal locks if this setting is disabled.",
             null, "", "Unlock All Backgrounds?"));
+
+        public static Configurable<bool> disableAutoRegionBackground = instance.config.Bind("disableAutoRegionBackground", true, new ConfigurableInfo(
+            "Disables the background art being automatically set to the current region on game start.",
+            null, "", "Disable Auto Region\nBackground?"));
 
         private OpSimpleButton? selectAllButton;
 
@@ -86,6 +90,7 @@ namespace RandomTitleScreen
             DrawCheckBoxes(ref Tabs[tabIndex]);
 
             AddCheckBox(unlockAllBackgrounds, (string)unlockAllBackgrounds.info.Tags[0]);
+            AddCheckBox(disableAutoRegionBackground, (string)disableAutoRegionBackground.info.Tags[0]);
             DrawCheckBoxes(ref Tabs[tabIndex]);
 
             AddNewLine(15);
@@ -201,16 +206,93 @@ namespace RandomTitleScreen
                 }
             }
 
-            RandomTitleScreen.Logger.LogWarning("Updated enabled scenes!");
+            RandomTitleScreen.Logger.LogWarning($"Updated enabled scenes! {enabledMenuScenes.Count}");
         }
 
         private static float GetCheckboxYOffset(int index) => (allMenuScenes.Length - index) * 40f - 15.01f;
 
         private static string GenerateSceneKey(Menu.MenuScene.SceneID sceneID) => "MenuScene_" + sceneID.value;
 
+        // Exclude the following from the defaults
         private static bool IsSceneDefaultEnabled(Menu.MenuScene.SceneID sceneID)
         {
+            // Either looks strange or is broken
             if (sceneID == Menu.MenuScene.SceneID.Empty) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.Intro_14_Title) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.Intro_9_Rainy_Climb) return false;
+
+            // Death and Starve
+            if (sceneID == Menu.MenuScene.SceneID.RedsDeathStatisticsBkg) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.NewDeath) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.StarveScreen) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.Slugcat_Dead_Red) return false;
+
+            // Selection Menus
+            if (sceneID == Menu.MenuScene.SceneID.Slugcat_Red) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.Slugcat_White) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.Slugcat_Yellow) return false;
+
+
+            // Downpour Selection Menus
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Survivor) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Monk) return false;
+
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Gourmand) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.End_Gourmand) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Gourmand) return false;
+            
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Gourmand_Full) return false;
+
+
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Artificer) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Artificer_Robo) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Artificer_Robo2) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.End_Artificer) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Artificer_Portrait) return false;
+
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Rivulet) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Rivulet_Cell) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.End_Rivulet) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Rivulet) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Rivulet_Robe) return false;
+
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Spear) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.End_Spear) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.AltEnd_Spearmaster) return false;
+
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Saint) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.SaintMaxKarma) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.End_Saint) return false;
+
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Inv) return false;
 
             return true;
         }
