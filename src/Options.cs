@@ -125,11 +125,11 @@ namespace RandomTitleScreen
 
         private void DrawScrollbox(ref int tabIndex)
         {
-            checkBoxes = new OpCheckBox[allMenuScenes.Length];
-            scrollBox = new OpScrollBox(new Vector2(30.0f, 40.0f), new Vector2(540.0f, 380.0f), allMenuScenes.Length * 40.0f + 40.0f, false, false, true);
+            checkBoxes = new OpCheckBox[allMenuScenes.Count];
+            scrollBox = new OpScrollBox(new Vector2(30.0f, 40.0f), new Vector2(540.0f, 380.0f), allMenuScenes.Count * 40.0f + 40.0f, false, false, true);
             Tabs[tabIndex].AddItems(new UIelement[] { scrollBox });
 
-            for (int i = 0; i < allMenuScenes.Length; i++)
+            for (int i = 0; i < allMenuScenes.Count; i++)
             {
                 checkBoxes[i] = new OpCheckBox(menuScenesConfig[i], new Vector2(90.0f, GetCheckboxYOffset(i) + 3.0f));
 
@@ -142,7 +142,7 @@ namespace RandomTitleScreen
 
                 scrollBox.AddItems(new UIelement[]
                 {
-                    new OpLabel(new Vector2(124.0f, GetCheckboxYOffset(i)), new Vector2(160f, 30f), allMenuScenes[i].ToString(), FLabelAlignment.Left, false, null)
+                    new OpLabel(new Vector2(124.0f, GetCheckboxYOffset(i)), new Vector2(160f, 30f), allMenuScenes[i].value, FLabelAlignment.Left, false, null)
                     {
                         bumpBehav = checkBoxes[i].bumpBehav
                     }
@@ -169,26 +169,37 @@ namespace RandomTitleScreen
 
 
         public static List<Menu.MenuScene.SceneID> enabledMenuScenes = new List<Menu.MenuScene.SceneID>();
-        private static Configurable<bool>[] menuScenesConfig = null!;
 
-        private static Menu.MenuScene.SceneID[] allMenuScenes = null!;
+        private static List<Menu.MenuScene.SceneID> allMenuScenes = new List<Menu.MenuScene.SceneID>();
+        private static List<Configurable<bool>> menuScenesConfig  = new List<Configurable<bool>>();
 
         private static OpCheckBox[] checkBoxes = null!;
         private static OpScrollBox scrollBox = null!;
 
         public static void InitializeMenuScenesConfig()
         {
-            allMenuScenes = new Menu.MenuScene.SceneID[Menu.MenuScene.SceneID.values.Count];
-            menuScenesConfig = new Configurable<bool>[allMenuScenes.Length];
+            int sceneCount = 0;
 
-            for (int i = 0; i < allMenuScenes.Length; i++)
+            for (int i = 0; i < Menu.MenuScene.SceneID.values.Count; i++)
             {
                 string enumName = Menu.MenuScene.SceneID.values.entries[i];
                 Menu.MenuScene.SceneID sceneID = new Menu.MenuScene.SceneID(enumName);
 
-                allMenuScenes[i] = sceneID;
+                // Literally crashes the game
+                if (sceneID == Menu.MenuScene.SceneID.Outro_3_Face) continue;
 
-                menuScenesConfig[i] = instance.config.Bind(GenerateSceneKey(allMenuScenes[i]), IsSceneDefaultEnabled(allMenuScenes[i]));
+                // Looks strange
+                if (sceneID == Menu.MenuScene.SceneID.Empty) continue;
+
+                if (sceneID == Menu.MenuScene.SceneID.Intro_14_Title) continue;
+
+                if (sceneID == Menu.MenuScene.SceneID.Intro_9_Rainy_Climb) continue;
+
+                if (sceneID == Menu.MenuScene.SceneID.Intro_10_Fall) continue;
+
+                allMenuScenes.Add(sceneID);
+                menuScenesConfig.Add(instance.config.Bind(GenerateSceneKey(allMenuScenes[sceneCount]), IsSceneDefaultEnabled(allMenuScenes[sceneCount])));
+                sceneCount++;
             }
 
             UpdateAvailableScenes();
@@ -198,7 +209,7 @@ namespace RandomTitleScreen
         {
             enabledMenuScenes.Clear();
 
-            for (int i = 0; i < allMenuScenes.Length; i++)
+            for (int i = 0; i < allMenuScenes.Count; i++)
             {
                 if (menuScenesConfig[i].Value)
                 {
@@ -209,23 +220,15 @@ namespace RandomTitleScreen
             RandomTitleScreen.Logger.LogWarning($"Updated enabled scenes! {enabledMenuScenes.Count}");
         }
 
-        private static float GetCheckboxYOffset(int index) => (allMenuScenes.Length - index) * 40f - 15.01f;
+        private static float GetCheckboxYOffset(int index) => (allMenuScenes.Count - index) * 40f - 15.01f;
 
         private static string GenerateSceneKey(Menu.MenuScene.SceneID sceneID) => "MenuScene_" + sceneID.value;
 
         // Exclude the following from the defaults
         private static bool IsSceneDefaultEnabled(Menu.MenuScene.SceneID sceneID)
         {
-            // Either looks strange or is broken
-            if (sceneID == Menu.MenuScene.SceneID.Empty) return false;
-
-            if (sceneID == Menu.MenuScene.SceneID.Intro_14_Title) return false;
-
-            if (sceneID == Menu.MenuScene.SceneID.Intro_9_Rainy_Climb) return false;
-
+            // Parallax broken but works
             if (sceneID == Menu.MenuScene.SceneID.Intro_2_Branch) return false;
-
-            if (sceneID == Menu.MenuScene.SceneID.Intro_10_Fall) return false;
 
 
             // Death and Starve
