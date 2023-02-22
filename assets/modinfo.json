@@ -4,7 +4,7 @@
 	"version": "1.0.0",
 	"target_game_version": "v1.9.05",
 	"authors": "forthbridge",
-	"description": "Randomizes the title screen illustrations on menu changes!<LINE><LINE>Fully configurable disable or enable illustrations you want in rotation!",
+	"description": "Randomizes the scene illustrations whenever the menu changes!<LINE><LINE>Fully configurable within Remix - disable or enable the scenes you want in rotation!<LINE><LINE>Source: https://github.com/forthbridge/random-title-screen",
 	"requirements": [],
 	"requirements_names": [],
 	"checksum_override_version": false
