@@ -1,0 +1,10 @@
+[h1]Randomizes the background illustration whenever the menu changes![/h1]
+ 
+[h1]Fully configurable through the Remix menu - toggle the illustrations that you want in rotation![/h1]
+
+[b]Affects all menus, compatible with Downpour, and works without Downpour or Remix enabled![b]
+
+[b][u]Background illustrations may persist after uninstalling, please enable Remix and use the Backgrounds Menu under Options to change them back to the ones you want![/u][b]
+
+[b][u]Source: https://github.com/forthbridge/random-title-screen[/u]
+Please report any issues over there, or alternatively, contact me on Discord! (forthbridge#0683)[/b]
