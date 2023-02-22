@@ -223,6 +223,11 @@ namespace RandomTitleScreen
 
             if (sceneID == Menu.MenuScene.SceneID.Intro_9_Rainy_Climb) return false;
 
+            if (sceneID == Menu.MenuScene.SceneID.Intro_2_Branch) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.Intro_10_Fall) return false;
+
+
             // Death and Starve
             if (sceneID == Menu.MenuScene.SceneID.RedsDeathStatisticsBkg) return false;
 
@@ -232,12 +237,19 @@ namespace RandomTitleScreen
 
             if (sceneID == Menu.MenuScene.SceneID.Slugcat_Dead_Red) return false;
 
+
             // Selection Menus
             if (sceneID == Menu.MenuScene.SceneID.Slugcat_Red) return false;
 
+            if (sceneID == Menu.MenuScene.SceneID.Ghost_Red) return false;
+
             if (sceneID == Menu.MenuScene.SceneID.Slugcat_White) return false;
 
+            if (sceneID == Menu.MenuScene.SceneID.Ghost_White) return false;
+
             if (sceneID == Menu.MenuScene.SceneID.Slugcat_Yellow) return false;
+
+            if (sceneID == Menu.MenuScene.SceneID.Ghost_Yellow) return false;
 
 
             // Downpour Selection Menus
@@ -287,12 +299,14 @@ namespace RandomTitleScreen
 
             if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Saint) return false;
 
-            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.SaintMaxKarma) return false;
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Saint_Max) return false;
 
             if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.End_Saint) return false;
 
 
             if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.Slugcat_Inv) return false;
+
+            if (sceneID == MoreSlugcats.MoreSlugcatsEnums.MenuSceneID.End_Inv) return false;
 
             return true;
         }
