@@ -1,4 +1,6 @@
-[h1]Randomizes the background illustration whenever the menu changes![/h1]
+[h1][u]Beware of spoilers! Ending scenes are in rotation by default![/u][/h1]
+
+[h1]Randomizes the background illustration whenever the menu changes, and includes pretty much every scene ingame![/h1]
  
 [h1]Fully configurable through the Remix menu - toggle the illustrations that you want in rotation![/h1]
 
