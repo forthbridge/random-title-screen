@@ -12,7 +12,7 @@ using System.Security;
 
 namespace RandomTitleScreen
 {
-    [BepInPlugin(MOD_ID + "." + AUTHOR, MOD_NAME, VERSION)]
+    [BepInPlugin(AUTHOR + "." + MOD_ID, MOD_NAME, VERSION)]
     internal class RandomTitleScreen : BaseUnityPlugin
     {
         public static new ManualLogSource Logger { get; private set; } = null!;
