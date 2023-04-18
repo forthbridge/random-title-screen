@@ -7,13 +7,13 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Rain World Modded\RainWorld_Data\StreamingAssets\mods\randomtitlescreen\plugins&quot;" />
+  </Target>
+
   <ItemGroup>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\Backups\Rain World\Rain World References\BepInEx\core\BepInEx.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\Backups\Rain World\Rain World References\BepInEx\utils\STRIPPED-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>..\..\..\Backups\Rain World\Rain World References\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
@@ -30,19 +30,16 @@
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\..\Backups\Rain World\Rain World References\RainWorld_Data\Managed\MonoMod.Utils.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\Backups\Rain World\Rain World References\RainWorld_Data\Managed\STRIPPED-Assembly-CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Backups\Rain World\Rain World References\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
     </Reference>
-	<Reference Include="UnityEngine.CoreModule">
-		<HintPath>..\..\..\Backups\Rain World\Rain World References\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-		<Private>False</Private>
-	</Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\Backups\Rain World\Rain World References\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /Y &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Rain World Modded\RainWorld_Data\StreamingAssets\mods\randomtitlescreen\plugins&quot;" />
-  </Target>
 
   <ItemGroup>
     <Reference Update="System">

@@ -37,17 +37,17 @@ namespace RandomTitleScreen
         private OpSimpleButton? selectAllButton;
 
         private OpSimpleButton? deselectAllButton;
+
         #endregion
 
         #region Parameters
+
         private readonly float spacing = 20f;
         private readonly float fontHeight = 20f;
         private readonly int numberOfCheckboxes = 2;
         private readonly float checkBoxSize = 60.0f;
         private float CheckBoxWithSpacing => checkBoxSize + 0.25f * spacing;
-        #endregion
 
-        #region Variables
         private Vector2 marginX = new();
         private Vector2 pos = new();
 
@@ -67,12 +67,10 @@ namespace RandomTitleScreen
         private readonly List<OpLabel> sliderTextLabelsRight = new();
 
         private readonly List<OpLabel> textLabels = new();
+
         #endregion
 
-        public Options()
-        {
-            OnConfigChanged += UpdateAvailableScenes;
-        }
+        public Options() => OnConfigChanged += UpdateAvailableScenes;
 
         private const int NUMBER_OF_TABS = 2;
 
@@ -96,8 +94,11 @@ namespace RandomTitleScreen
             AddNewLine(15);
             DrawBox(ref Tabs[tabIndex]);
 
+
+
             AddTab(ref tabIndex, "Illustrations");
             AddNewLine(2);
+
 
             selectAllButton = new OpSimpleButton(new Vector2(350.0f, pos.y), new Vector2(150.0f, 30.0f), "Select All")
             {
@@ -108,6 +109,7 @@ namespace RandomTitleScreen
             selectAllButton.OnClick += SelectAllButton_OnClick;
             Tabs[tabIndex].AddItems(selectAllButton);
 
+
             deselectAllButton = new OpSimpleButton(new Vector2(100.0f, pos.y), new Vector2(150.0f, 30.0f), "Deselect All")
             {
                 colorEdge = new Color(1f, 1f, 1f, 1f),
@@ -117,11 +119,14 @@ namespace RandomTitleScreen
             deselectAllButton.OnClick += DeselectAllButton_OnClick;
             Tabs[tabIndex].AddItems(deselectAllButton);
 
+
             DrawScrollbox(ref tabIndex);
 
             AddNewLine(19);
             DrawBox(ref Tabs[tabIndex]);
         }
+
+
 
         private void DrawScrollbox(ref int tabIndex)
         {
@@ -134,9 +139,9 @@ namespace RandomTitleScreen
                 checkBoxes[i] = new OpCheckBox(menuScenesConfig[i], new Vector2(90.0f, GetCheckboxYOffset(i) + 3.0f));
 
                 if (i > 0)
-                {
                     UIfocusable.MutualVerticalFocusableBind(checkBoxes[i], checkBoxes[i - 1]);
-                }
+
+
 
                 scrollBox.AddItems(new UIelement[] { checkBoxes[i] });
 
@@ -154,27 +159,26 @@ namespace RandomTitleScreen
         private void SelectAllButton_OnClick(UIfocusable trigger)
         {
             foreach (OpCheckBox checkBox in checkBoxes)
-            {
                 checkBox.SetValueBool(true);
-            }
         }
 
         private void DeselectAllButton_OnClick(UIfocusable trigger)
         {
             foreach (OpCheckBox checkBox in checkBoxes)
-            {
                 checkBox.SetValueBool(false);
-            }
         }
+
 
 
         public static List<Menu.MenuScene.SceneID> enabledMenuScenes = new List<Menu.MenuScene.SceneID>();
 
-        private static List<Menu.MenuScene.SceneID> allMenuScenes = new List<Menu.MenuScene.SceneID>();
-        private static List<Configurable<bool>> menuScenesConfig  = new List<Configurable<bool>>();
+        private static readonly List<Menu.MenuScene.SceneID> allMenuScenes = new List<Menu.MenuScene.SceneID>();
+        private static readonly List<Configurable<bool>> menuScenesConfig  = new List<Configurable<bool>>();
 
         private static OpCheckBox[] checkBoxes = null!;
         private static OpScrollBox scrollBox = null!;
+
+
 
         public static void InitializeMenuScenesConfig()
         {
@@ -184,6 +188,8 @@ namespace RandomTitleScreen
             {
                 string enumName = Menu.MenuScene.SceneID.values.entries[i];
                 Menu.MenuScene.SceneID sceneID = new Menu.MenuScene.SceneID(enumName);
+
+
 
                 // Literally crashes the game
                 if (sceneID == Menu.MenuScene.SceneID.Outro_3_Face) continue;
@@ -197,8 +203,11 @@ namespace RandomTitleScreen
 
                 if (sceneID == Menu.MenuScene.SceneID.Intro_10_Fall) continue;
 
+
+
                 allMenuScenes.Add(sceneID);
                 menuScenesConfig.Add(instance.config.Bind(GenerateSceneKey(allMenuScenes[sceneCount]), IsSceneDefaultEnabled(allMenuScenes[sceneCount])));
+
                 sceneCount++;
             }
 
@@ -210,15 +219,13 @@ namespace RandomTitleScreen
             enabledMenuScenes.Clear();
 
             for (int i = 0; i < allMenuScenes.Count; i++)
-            {
                 if (menuScenesConfig[i].Value)
-                {
                     enabledMenuScenes.Add(allMenuScenes[i]);
-                }
-            }
 
-            RandomTitleScreen.Logger.LogWarning($"Updated enabled scenes! {enabledMenuScenes.Count}");
+            Plugin.Logger.LogWarning($"Updated enabled scenes! {enabledMenuScenes.Count}");
         }
+
+
 
         private static float GetCheckboxYOffset(int index) => (allMenuScenes.Count - index) * 40f - 15.01f;
 
@@ -314,7 +321,10 @@ namespace RandomTitleScreen
             return true;
         }
 
+
+
         #region UI Elements
+
         private void AddTab(ref int tabIndex, string tabName)
         {
             tabIndex++;
@@ -322,11 +332,11 @@ namespace RandomTitleScreen
             InitializeMarginAndPos();
 
             AddNewLine();
-            AddTextLabel(RandomTitleScreen.MOD_NAME, bigText: true);
+            AddTextLabel(Plugin.MOD_NAME, bigText: true);
             DrawTextLabels(ref Tabs[tabIndex]);
 
             AddNewLine(0.5f);
-            AddTextLabel("Version " + RandomTitleScreen.VERSION, FLabelAlignment.Left);
+            AddTextLabel("Version " + Plugin.VERSION, FLabelAlignment.Left);
             AddTextLabel("by " + AUTHORS_NAME, FLabelAlignment.Right);
             DrawTextLabels(ref Tabs[tabIndex]);
 
@@ -414,112 +424,6 @@ namespace RandomTitleScreen
             checkBoxesTextLabels.Clear();
         }
 
-        private void AddComboBox(Configurable<string> configurable, List<ListItem> list, string text, bool allowEmpty = false)
-        {
-            OpLabel opLabel = new(new Vector2(), new Vector2(0.0f, fontHeight), text, FLabelAlignment.Center, false);
-            comboBoxesTextLabels.Add(opLabel);
-            comboBoxConfigurables.Add(configurable);
-            comboBoxLists.Add(list);
-            comboBoxAllowEmpty.Add(allowEmpty);
-        }
-
-        private void DrawComboBoxes(ref OpTab tab)
-        {
-            if (comboBoxConfigurables.Count != comboBoxesTextLabels.Count) return;
-            if (comboBoxConfigurables.Count != comboBoxLists.Count) return;
-            if (comboBoxConfigurables.Count != comboBoxAllowEmpty.Count) return;
-
-            float offsetX = (marginX.y - marginX.x) * 0.1f;
-            float width = (marginX.y - marginX.x) * 0.4f;
-
-            for (int comboBoxIndex = 0; comboBoxIndex < comboBoxConfigurables.Count; ++comboBoxIndex)
-            {
-                AddNewLine(1.25f);
-                pos.x += offsetX;
-
-                OpLabel opLabel = comboBoxesTextLabels[comboBoxIndex];
-                opLabel.pos = pos;
-                opLabel.size += new Vector2(width, 2f); // size.y is already set
-                pos.x += width;
-
-                Configurable<string> configurable = comboBoxConfigurables[comboBoxIndex];
-                OpComboBox comboBox = new(configurable, pos, width, comboBoxLists[comboBoxIndex])
-                {
-                    allowEmpty = comboBoxAllowEmpty[comboBoxIndex],
-                    description = configurable.info?.description ?? ""
-                };
-                tab.AddItems(opLabel, comboBox);
-
-                // don't add a new line on the last element
-                if (comboBoxIndex < comboBoxConfigurables.Count - 1)
-                {
-                    AddNewLine();
-                    pos.x = marginX.x;
-                }
-            }
-
-            comboBoxesTextLabels.Clear();
-            comboBoxConfigurables.Clear();
-            comboBoxLists.Clear();
-            comboBoxAllowEmpty.Clear();
-        }
-
-        private void AddSlider(Configurable<int> configurable, string text, string sliderTextLeft = "", string sliderTextRight = "")
-        {
-            sliderConfigurables.Add(configurable);
-            sliderMainTextLabels.Add(text);
-            sliderTextLabelsLeft.Add(new OpLabel(new Vector2(), new Vector2(), sliderTextLeft, alignment: FLabelAlignment.Right)); // set pos and size when drawing
-            sliderTextLabelsRight.Add(new OpLabel(new Vector2(), new Vector2(), sliderTextRight, alignment: FLabelAlignment.Left));
-        }
-
-        private void DrawSliders(ref OpTab tab)
-        {
-            if (sliderConfigurables.Count != sliderMainTextLabels.Count) return;
-            if (sliderConfigurables.Count != sliderTextLabelsLeft.Count) return;
-            if (sliderConfigurables.Count != sliderTextLabelsRight.Count) return;
-
-            float width = marginX.y - marginX.x;
-            float sliderCenter = marginX.x + 0.5f * width;
-            float sliderLabelSizeX = 0.2f * width;
-            float sliderSizeX = width - 2f * sliderLabelSizeX - spacing;
-
-            for (int sliderIndex = 0; sliderIndex < sliderConfigurables.Count; ++sliderIndex)
-            {
-                AddNewLine(2f);
-
-                OpLabel opLabel = sliderTextLabelsLeft[sliderIndex];
-                opLabel.pos = new Vector2(marginX.x, pos.y + 5f);
-                opLabel.size = new Vector2(sliderLabelSizeX, fontHeight);
-                tab.AddItems(opLabel);
-
-                Configurable<int> configurable = sliderConfigurables[sliderIndex];
-                OpSlider slider = new(configurable, new Vector2(sliderCenter - 0.5f * sliderSizeX, pos.y), (int)sliderSizeX)
-                {
-                    size = new Vector2(sliderSizeX, fontHeight),
-                    description = configurable.info?.description ?? ""
-                };
-                tab.AddItems(slider);
-
-                opLabel = sliderTextLabelsRight[sliderIndex];
-                opLabel.pos = new Vector2(sliderCenter + 0.5f * sliderSizeX + 0.5f * spacing, pos.y + 5f);
-                opLabel.size = new Vector2(sliderLabelSizeX, fontHeight);
-                tab.AddItems(opLabel);
-
-                AddTextLabel(sliderMainTextLabels[sliderIndex]);
-                DrawTextLabels(ref tab);
-
-                if (sliderIndex < sliderConfigurables.Count - 1)
-                {
-                    AddNewLine();
-                }
-            }
-
-            sliderConfigurables.Clear();
-            sliderMainTextLabels.Clear();
-            sliderTextLabelsLeft.Clear();
-            sliderTextLabelsRight.Clear();
-        }
-
         private void AddTextLabel(string text, FLabelAlignment alignment = FLabelAlignment.Center, bool bigText = false)
         {
             float textHeight = (bigText ? 2f : 1f) * fontHeight;
@@ -554,6 +458,7 @@ namespace RandomTitleScreen
             pos.x = marginX.x;
             textLabels.Clear();
         }
+
         #endregion
     }
 }

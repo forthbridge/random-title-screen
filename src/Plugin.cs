@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using BepInEx.Logging;
-using System;
 using System.Security.Permissions;
 using System.Security;
 
@@ -13,11 +12,11 @@ using System.Security;
 namespace RandomTitleScreen
 {
     [BepInPlugin(AUTHOR + "." + MOD_ID, MOD_NAME, VERSION)]
-    internal class RandomTitleScreen : BaseUnityPlugin
+    internal class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger { get; private set; } = null!;
 
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.0.1";
         public const string MOD_NAME = "Random Title Screen";
         public const string MOD_ID = "randomtitlescreen";
         public const string AUTHOR = "forthbridge";
