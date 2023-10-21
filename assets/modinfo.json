@@ -1,7 +1,7 @@
 {
 	"id": "randomtitlescreen",
 	"name": "Random Title Screen",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"authors": "forthbridge",
 	"description": "Randomizes the scene illustrations whenever the menu changes!<LINE><LINE>Fully configurable within Remix - disable or enable the scenes you want in rotation!<LINE><LINE><LINE>Source: https://github.com/forthbridge/random-title-screen",
 	"requirements": [],

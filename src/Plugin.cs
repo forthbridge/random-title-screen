@@ -9,22 +9,22 @@ using System.Security;
 #pragma warning restore CS0618 // Type or member is obsolete
 
 
-namespace RandomTitleScreen
+namespace RandomTitleScreen;
+
+[BepInPlugin(MOD_ID, MOD_ID, "1.0.0")]
+internal class Plugin : BaseUnityPlugin
 {
-    [BepInPlugin(AUTHOR + "." + MOD_ID, MOD_NAME, VERSION)]
-    internal class Plugin : BaseUnityPlugin
+    public const string MOD_ID = "randomtitlescreen";
+
+    public static string MOD_NAME = "";
+    public static string VERSION = "";
+    public static string AUTHORS = "";
+
+    public static new ManualLogSource Logger { get; private set; } = null!;
+
+    public void OnEnable()
     {
-        public static new ManualLogSource Logger { get; private set; } = null!;
-
-        public const string VERSION = "1.0.1";
-        public const string MOD_NAME = "Random Title Screen";
-        public const string MOD_ID = "randomtitlescreen";
-        public const string AUTHOR = "forthbridge";
-
-        public void OnEnable()
-        {
-            Logger = base.Logger;
-            Hooks.ApplyHooks();
-        }
+        Logger = base.Logger;
+        Hooks.ApplyInit();
     }
 }
